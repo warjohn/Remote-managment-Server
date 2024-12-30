@@ -1,0 +1,10 @@
+^C:\USERS\MENAR\SOURCE\C++\SOCKET\BUILD\CMAKEFILES\F16EE538418C38D682FA7BE39441F1ED\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe" -SC:/Users/Menar/source/C++/socket -BC:/Users/Menar/source/C++/socket/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file C:/Users/Menar/source/C++/socket/build/socket.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd

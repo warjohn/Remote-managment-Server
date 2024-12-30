@@ -1,0 +1,8 @@
+C:/Users/Menar/source/C++/socket/build/CMakeFiles/socket.dir
+C:/Users/Menar/source/C++/socket/build/CMakeFiles/Experimental.dir
+C:/Users/Menar/source/C++/socket/build/CMakeFiles/Nightly.dir
+C:/Users/Menar/source/C++/socket/build/CMakeFiles/Continuous.dir
+C:/Users/Menar/source/C++/socket/build/CMakeFiles/NightlyMemoryCheck.dir
+C:/Users/Menar/source/C++/socket/build/CMakeFiles/RUN_TESTS.dir
+C:/Users/Menar/source/C++/socket/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Menar/source/C++/socket/build/CMakeFiles/ZERO_CHECK.dir

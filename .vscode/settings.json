@@ -1,0 +1,7 @@
+{
+    "cmake.configureOnOpen": true,
+    "cmake.configureSettings": {
+        "CMAKE_TOOLCHAIN_FILE": "C:/Users/Menar/source/C++/vcpkg/scripts/buildsystems/vcpkg.cmake"
+    },
+
+}
