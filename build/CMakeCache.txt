@@ -21,7 +21,7 @@ BUILD_TESTING:BOOL=ON
 CMAKE_AR:FILEPATH=C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.41.34120/bin/Hostx64/x64/lib.exe
 
 //No help, variable specified on the command line.
-CMAKE_BUILD_TYPE:STRING=Release
+CMAKE_BUILD_TYPE:STRING=Debug
 
 //Semicolon separated list of supported configuration types, only
 // supports Debug, Release, MinSizeRel, and RelWithDebInfo, anything
@@ -188,8 +188,8 @@ CMAKE_STATIC_LINKER_FLAGS_RELEASE:STRING=
 // during RELWITHDEBINFO builds.
 CMAKE_STATIC_LINKER_FLAGS_RELWITHDEBINFO:STRING=
 
-//The CMake toolchain file
-CMAKE_TOOLCHAIN_FILE:FILEPATH=C:/Users/Menar/source/C++/vcpkg/scripts/buildsystems/vcpkg.cmake
+//No help, variable specified on the command line.
+CMAKE_TOOLCHAIN_FILE:STRING=C:/Users/Menar/source/C++/vcpkg/scripts/buildsystems/vcpkg.cmake
 
 //If this value is on, makefiles will be generated without the
 // .SILENT directive, and all commands will be echoed to the console
@@ -212,6 +212,9 @@ CTEST_SUBMIT_RETRY_DELAY:STRING=5
 
 //Maximum time allowed before CTest will kill the test.
 DART_TESTING_TIMEOUT:STRING=1500
+
+//Path to a program.
+GITCOMMAND:FILEPATH=C:/Program Files/Git/cmd/git.exe
 
 //Path to a library.
 LIB_EAY_DEBUG:FILEPATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/debug/lib/libcrypto.lib
@@ -282,6 +285,15 @@ X_VCPKG_APPLOCAL_DEPS_INSTALL:BOOL=OFF
 // serialization.
 X_VCPKG_APPLOCAL_DEPS_SERIALIZED:BOOL=OFF
 
+//Path to a file.
+ZLIB_INCLUDE_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/include
+
+//Path to a library.
+ZLIB_LIBRARY_DEBUG:FILEPATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/debug/lib/zlibd.lib
+
+//Path to a library.
+ZLIB_LIBRARY_RELEASE:FILEPATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/lib/zlib.lib
+
 //Path to a program.
 Z_VCPKG_BUILTIN_POWERSHELL_PATH:FILEPATH=C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
 
@@ -291,6 +303,45 @@ Z_VCPKG_PWSH_PATH:FILEPATH=Z_VCPKG_PWSH_PATH-NOTFOUND
 //The directory which contains the installed libraries for each
 // triplet
 _VCPKG_INSTALLED_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed
+
+//The directory containing a CMake configuration file for aws-c-auth.
+aws-c-auth_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-auth
+
+//The directory containing a CMake configuration file for aws-c-cal.
+aws-c-cal_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-cal
+
+//The directory containing a CMake configuration file for aws-c-common.
+aws-c-common_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-common
+
+//The directory containing a CMake configuration file for aws-c-compression.
+aws-c-compression_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-compression
+
+//The directory containing a CMake configuration file for aws-c-event-stream.
+aws-c-event-stream_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-event-stream
+
+//The directory containing a CMake configuration file for aws-c-http.
+aws-c-http_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-http
+
+//The directory containing a CMake configuration file for aws-c-io.
+aws-c-io_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-io
+
+//The directory containing a CMake configuration file for aws-c-mqtt.
+aws-c-mqtt_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-mqtt
+
+//The directory containing a CMake configuration file for aws-c-s3.
+aws-c-s3_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-s3
+
+//The directory containing a CMake configuration file for aws-c-sdkutils.
+aws-c-sdkutils_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-c-sdkutils
+
+//The directory containing a CMake configuration file for aws-checksums.
+aws-checksums_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-checksums
+
+//The directory containing a CMake configuration file for aws-cpp-sdk-core.
+aws-cpp-sdk-core_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-cpp-sdk-core
+
+//The directory containing a CMake configuration file for aws-crt-cpp.
+aws-crt-cpp_DIR:PATH=C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/share/aws-crt-cpp
 
 //Value Computed by CMake
 socket_BINARY_DIR:STATIC=C:/Users/Menar/source/C++/socket/build
@@ -370,6 +421,12 @@ CMAKE_GENERATOR_INSTANCE:INTERNAL=C:/Program Files/Microsoft Visual Studio/2022/
 CMAKE_GENERATOR_PLATFORM:INTERNAL=
 //Name of generator toolset.
 CMAKE_GENERATOR_TOOLSET:INTERNAL=
+//Test CMAKE_HAVE_LIBC_PTHREAD
+CMAKE_HAVE_LIBC_PTHREAD:INTERNAL=
+//Have library pthreads
+CMAKE_HAVE_PTHREADS_CREATE:INTERNAL=
+//Have library pthread
+CMAKE_HAVE_PTHREAD_CREATE:INTERNAL=
 //Source directory with the top level CMakeLists.txt file for this
 // project
 CMAKE_HOME_DIRECTORY:INTERNAL=C:/Users/Menar/source/C++/socket
@@ -448,6 +505,12 @@ CTEST_SUBMIT_RETRY_DELAY-ADVANCED:INTERNAL=1
 DART_TESTING_TIMEOUT-ADVANCED:INTERNAL=1
 //Details about finding OpenSSL
 FIND_PACKAGE_MESSAGE_DETAILS_OpenSSL:INTERNAL=[optimized;C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/lib/libcrypto.lib;debug;C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/debug/lib/libcrypto.lib][C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/include][c ][v3.4.0()]
+//Details about finding Threads
+FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
+//Details about finding ZLIB
+FIND_PACKAGE_MESSAGE_DETAILS_ZLIB:INTERNAL=[optimized;C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/lib/zlib.lib;debug;C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/debug/lib/zlibd.lib][C:/Users/Menar/source/C++/vcpkg/installed/x64-windows/include][c ][v1.3.1()]
+//ADVANCED property for variable: GITCOMMAND
+GITCOMMAND-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: MAKECOMMAND
 MAKECOMMAND-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: MEMORYCHECK_COMMAND
@@ -466,6 +529,12 @@ SITE-ADVANCED:INTERNAL=1
 VCPKG_MANIFEST_INSTALL:INTERNAL=OFF
 //ADVANCED property for variable: VCPKG_VERBOSE
 VCPKG_VERBOSE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ZLIB_INCLUDE_DIR
+ZLIB_INCLUDE_DIR-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ZLIB_LIBRARY_DEBUG
+ZLIB_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: ZLIB_LIBRARY_RELEASE
+ZLIB_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //Making sure VCPKG_MANIFEST_MODE doesn't change
 Z_VCPKG_CHECK_MANIFEST_MODE:INTERNAL=OFF
 //The path to the PowerShell implementation to use.
