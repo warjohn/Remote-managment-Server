@@ -1,10 +1,16 @@
 #include "server.h"
 #include "crypto/crypto.h"
-
+#include <openssl/x509v3.h>
+#include <openssl/pem.h>
+#include <openssl/rand.h>
+#include <openssl/asn1.h>
+#include <openssl/ssl.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 #include <iostream>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-
+#include <vector>
 
 // Конструктор с параметрами
 Server::Server(int port) {
@@ -22,6 +28,12 @@ Server::~Server() {
 
 void Server::server_start() {
     init();
+    while (true) {
+        
+        AcceptClients();
+        
+    }
+    
 }
 
 
@@ -60,12 +72,51 @@ void Server::init() {
     }
 
     Crypto crypto;
-    crypto.generatingKeys();
+    ctx = crypto.generatingKeys();
 
     std::cout << "Server listening on port " << serverPort << std::endl;
 }
 
 
-void Server::Createtlscerts() {
+void Server::AcceptClients() { 
+    int clientLen = sizeof(clientAddr);
+    clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &clientLen);
+    if (clientSocket == INVALID_SOCKET) {
+        std::cerr << "Accept failed with error: " << WSAGetLastError() << std::endl;
+        return;
+    }
+    SSL* ssl = SSL_new(ctx);
+    SSL_set_fd(ssl, (int)clientSocket);
 
+    if (SSL_accept(ssl) <= 0) {
+        ERR_print_errors_fp(stderr);
+    } else {
+        std::cout << "SSL connection established with client." << std::endl;
+        std::string recieving_string = handelClient();
+        std::cout << "Server get - \t" << recieving_string << std::endl;
+    }
+
+    SSL_free(ssl);
+    shutdown(clientSocket, SD_BOTH);
+}
+
+
+
+std::string Server::handelClient() { 
+    std::vector<char> receivedData;
+
+    while (true) {
+        int bytesReceived = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
+        if (bytesReceived == 0) {
+            break;
+        }
+        for (int i = 0; i < bytesReceived; ++i) {
+            receivedData.push_back(buffer[i]);
+        }
+    }
+
+    receivedData.push_back('\0');
+    std::string receivedString(receivedData.begin(), receivedData.end() - 1);
+    return receivedString;
+    
 }

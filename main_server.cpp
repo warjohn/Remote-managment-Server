@@ -6,7 +6,6 @@
 #include <cstdlib>
 
 int main(int argc, char* argv[]){
-    fmt::print("Hello World!\n");
 
    if (argc < 2) {
         std::cerr << "Error: Port argument is missing." << std::endl;

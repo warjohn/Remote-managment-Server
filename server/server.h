@@ -5,6 +5,13 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <iostream>
+#include <openssl/x509v3.h>
+#include <openssl/pem.h>
+#include <openssl/rand.h>
+#include <openssl/asn1.h>
+#include <openssl/ssl.h>
+#include <openssl/ssl.h>
+#include <openssl/err.h>
 
 
 class Server {
@@ -18,14 +25,15 @@ public:
 
 private:
     int serverPort;      
-    int serverSocket;    
+    SOCKET serverSocket;   
+    SOCKET clientSocket; 
+    SSL_CTX* ctx;
+    char buffer[16384];
     struct sockaddr_in serverAddr, clientAddr;
 
     void init();
-
-    void Createtlscerts();
-    void CreateCAcerts();
-    SSL_CTX* createSSLContext()
+    void AcceptClients();
+    std::string handelClient();
 };
 
 #endif // SERVER_H
