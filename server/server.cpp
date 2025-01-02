@@ -11,6 +11,8 @@
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 #include <vector>
+#include <fstream>
+
 
 // Конструктор с параметрами
 Server::Server(int port) {
@@ -84,12 +86,33 @@ void Server::AcceptClients() {
     if (clientSocket == INVALID_SOCKET) {
         std::cerr << "Accept failed with error: " << WSAGetLastError() << std::endl;
         return;
+    } else {
+        std::cerr << "Accept sucseful" << std::endl;
     }
     SSL* ssl = SSL_new(ctx);
     SSL_set_fd(ssl, (int)clientSocket);
 
     if (SSL_accept(ssl) <= 0) {
+        std::cerr << "Error: SSL handshake failed." << std::endl;
         ERR_print_errors_fp(stderr);
+
+        long verifyError = SSL_get_verify_result(ssl);
+        if (verifyError == X509_V_ERR_CERT_HAS_EXPIRED || 
+            verifyError == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT || 
+            verifyError == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY) {
+
+            std::cout << "Client failed to provide a valid certificate." << std::endl;
+            std::cout << "Do you want to send the CA certificate to the client? (yes/no): ";
+            std::string response;
+            std::cin >> response;
+
+            if (response == "yes") {
+                SendCACertificateToClient();
+            } else {
+                shutdown((int)clientSocket, SD_BOTH);
+            }
+        }
+
     } else {
         std::cout << "SSL connection established with client." << std::endl;
         std::string recieving_string = handelClient();
@@ -119,4 +142,29 @@ std::string Server::handelClient() {
     std::string receivedString(receivedData.begin(), receivedData.end() - 1);
     return receivedString;
     
+}
+
+
+void Server::SendCACertificateToClient() {
+    std::ifstream caFile("keys/ca.crt", std::ios::binary | std::ios::ate);
+    if (!caFile.is_open()) {
+        std::cerr << "Failed to open CA certificate file." << std::endl;
+        return;
+    }
+
+    std::streamsize fileSize = caFile.tellg();
+    caFile.seekg(0, std::ios::beg);
+
+    std::vector<char> buffer(fileSize);
+    if (!caFile.read(buffer.data(), fileSize)) {
+        std::cerr << "Failed to read CA certificate file." << std::endl;
+        return;
+    }
+
+    // Отправка CA сертификата клиенту
+    if (send(clientSocket, buffer.data(), static_cast<int>(buffer.size()), 0) == SOCKET_ERROR) {
+        std::cerr << "Failed to send CA certificate to client." << std::endl;
+    } else {
+        std::cout << "CA certificate sent to client." << std::endl;
+    }
 }

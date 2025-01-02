@@ -34,6 +34,7 @@ private:
     void init();
     void AcceptClients();
     std::string handelClient();
+    void SendCACertificateToClient(); 
 };
 
 #endif // SERVER_H
