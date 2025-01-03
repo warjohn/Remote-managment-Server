@@ -1,43 +1,41 @@
 #include "server.h"
-#include "crypto/crypto.h"
-#include <openssl/x509v3.h>
-#include <openssl/pem.h>
-#include <openssl/rand.h>
-#include <openssl/asn1.h>
-#include <openssl/ssl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 #include <iostream>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
-#include <vector>
 #include <fstream>
+#include <vector>
 
-
-// Конструктор с параметрами
-Server::Server(int port) {
-    this->serverPort = port;
-    std::cout << "Server created and would work on - " << serverPort << " port" << std::endl;
+Server::Server(int port) : serverPort(port), serverSocket(INVALID_SOCKET), clientSocket(INVALID_SOCKET), ctx(nullptr) {
+    std::cout << "Server created and will work on port: " << serverPort << std::endl;
 }
 
-
 Server::~Server() {
+    if (clientSocket != INVALID_SOCKET) {
+        shutdown(clientSocket, SD_BOTH);
+        closesocket(clientSocket);
+    }
 
-    shutdown(serverSocket, SD_BOTH);
+    if (serverSocket != INVALID_SOCKET) {
+        shutdown(serverSocket, SD_BOTH);
+        closesocket(serverSocket);
+    }
+
+    if (ctx != nullptr) {
+        SSL_CTX_free(ctx);
+    }
+
     WSACleanup();
     std::cout << "Server closed" << std::endl;
 }
 
-void Server::server_start() {
+void Server::start() {
     init();
     while (true) {
-        
-        AcceptClients();
-        
+        acceptClients();
     }
-    
 }
-
 
 void Server::init() {
     WSADATA wsaData;
@@ -46,6 +44,7 @@ void Server::init() {
         return;
     }
 
+    // Создание сокета
     serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (serverSocket == INVALID_SOCKET) {
         std::cerr << "Socket creation failed with error: " << WSAGetLastError() << std::endl;
@@ -64,7 +63,7 @@ void Server::init() {
         closesocket(serverSocket);
         WSACleanup();
         return;
-    } 
+    }
 
     if (listen(serverSocket, 5) < 0) {
         perror("Listen failed");
@@ -73,79 +72,72 @@ void Server::init() {
         return;
     }
 
+    // Инициализация OpenSSL
+    OpenSSL_add_all_algorithms();
+    SSL_load_error_strings();
+    if (SSL_library_init() < 0) {
+        std::cerr << "SSL library initialization failed" << std::endl;
+        return;
+    }
+
     Crypto crypto;
-    ctx = crypto.generatingKeys();
+    ctx = crypto.generatingKeys();  // Генерация ключей
 
     std::cout << "Server listening on port " << serverPort << std::endl;
 }
 
-
-void Server::AcceptClients() { 
+void Server::acceptClients() {
     int clientLen = sizeof(clientAddr);
     clientSocket = accept(serverSocket, (struct sockaddr*)&clientAddr, &clientLen);
     if (clientSocket == INVALID_SOCKET) {
         std::cerr << "Accept failed with error: " << WSAGetLastError() << std::endl;
         return;
     } else {
-        std::cerr << "Accept sucseful" << std::endl;
+        std::cout << "Client connected" << std::endl;
     }
+
+    // Создаем SSL-сессию
     SSL* ssl = SSL_new(ctx);
     SSL_set_fd(ssl, (int)clientSocket);
 
     if (SSL_accept(ssl) <= 0) {
-        std::cerr << "Error: SSL handshake failed." << std::endl;
-        ERR_print_errors_fp(stderr);
-
-        long verifyError = SSL_get_verify_result(ssl);
-        if (verifyError == X509_V_ERR_CERT_HAS_EXPIRED || 
-            verifyError == X509_V_ERR_DEPTH_ZERO_SELF_SIGNED_CERT || 
-            verifyError == X509_V_ERR_UNABLE_TO_GET_ISSUER_CERT_LOCALLY) {
-
-            std::cout << "Client failed to provide a valid certificate." << std::endl;
-            std::cout << "Do you want to send the CA certificate to the client? (yes/no): ";
-            std::string response;
-            std::cin >> response;
-
-            if (response == "yes") {
-                SendCACertificateToClient();
-            } else {
-                shutdown((int)clientSocket, SD_BOTH);
-            }
-        }
-
+        std::cerr << "SSL accept failed" << std::endl;
+        SSL_free(ssl);
+        shutdown(clientSocket, SD_BOTH);
+        closesocket(clientSocket);
+        return;
     } else {
-        std::cout << "SSL connection established with client." << std::endl;
-        std::string recieving_string = handelClient();
-        std::cout << "Server get - \t" << recieving_string << std::endl;
+        std::cout << "SSL all good" << std::endl;
     }
 
+    // Обработка клиента
+    handleClient(ssl);
+
+    // Освобождение SSL-сессии
     SSL_free(ssl);
     shutdown(clientSocket, SD_BOTH);
+    closesocket(clientSocket);
 }
 
+void Server::handleClient(SSL* ssl) {\
+    std::string clientMessage = receiveData(ssl);
+    std::cout << "Received from client: " << clientMessage << std::endl;
 
+    if (clientMessage == "new") {
+        sendCACertificateToClient(ssl);
+    }  
+}
 
-std::string Server::handelClient() { 
+std::string Server::receiveData(SSL* ssl) {
     std::vector<char> receivedData;
-
-    while (true) {
-        int bytesReceived = recv(clientSocket, buffer, sizeof(buffer) - 1, 0);
-        if (bytesReceived == 0) {
-            break;
-        }
-        for (int i = 0; i < bytesReceived; ++i) {
-            receivedData.push_back(buffer[i]);
-        }
-    }
-
+    int bytesReceived;
+    bytesReceived = SSL_read(ssl, buffer, sizeof(buffer) - 1);
+    receivedData.insert(receivedData.end(), buffer, buffer + bytesReceived);
     receivedData.push_back('\0');
-    std::string receivedString(receivedData.begin(), receivedData.end() - 1);
-    return receivedString;
-    
+    return std::string(receivedData.begin(), receivedData.end() - 1);
 }
 
-
-void Server::SendCACertificateToClient() {
+void Server::sendCACertificateToClient(SSL* ssl) {
     std::ifstream caFile("keys/ca.crt", std::ios::binary | std::ios::ate);
     if (!caFile.is_open()) {
         std::cerr << "Failed to open CA certificate file." << std::endl;
@@ -161,10 +153,15 @@ void Server::SendCACertificateToClient() {
         return;
     }
 
-    // Отправка CA сертификата клиенту
-    if (send(clientSocket, buffer.data(), static_cast<int>(buffer.size()), 0) == SOCKET_ERROR) {
-        std::cerr << "Failed to send CA certificate to client." << std::endl;
+    const char* data = buffer.data();
+    int bytes_sent = 0;
+
+    bytes_sent = SSL_write(ssl, data, strlen(data));
+
+    if (bytes_sent <= 0) {
+        int error_code = SSL_get_error(ssl, bytes_sent);
+        std::cerr << "SSL_write error: " << error_code << std::endl;
     } else {
-        std::cout << "CA certificate sent to client." << std::endl;
+        std::cout << "Sent " << bytes_sent << " bytes." << std::endl;
     }
 }

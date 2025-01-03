@@ -20,7 +20,7 @@ int main(int argc, char* argv[]){
 
 
     Server server(port);
-    server.server_start();
+    server.start();
 
     system("pause");
     return 0;
