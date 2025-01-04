@@ -153,7 +153,21 @@ void Server::sendCACertificateToClient(SSL* ssl) {
         return;
     }
 
-    const char* data = buffer.data();
+    // Преобразуем буфер в строку
+    std::string dataStr(buffer.begin(), buffer.end());
+
+    // Найдём позицию конца сертификата
+    std::string endMarker = "-----END CERTIFICATE-----";
+    size_t pos = dataStr.find(endMarker);
+
+    if (pos != std::string::npos) {
+        // Оставляем данные до конца строки "-----END CERTIFICATE-----" + перенос строки
+        dataStr = dataStr.substr(0, pos + endMarker.length() + 1);
+    }
+
+    // Создаём const char* из строки
+    const char* data = dataStr.c_str();
+    std::cout << "DATA --- \t" << data << std::endl;
     int bytes_sent = 0;
 
     bytes_sent = SSL_write(ssl, data, strlen(data));
