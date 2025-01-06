@@ -10,6 +10,9 @@
     <ClCompile Include="C:\Users\Menar\source\C++\socket\server\crypto\crypto.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="C:\Users\Menar\source\C++\socket\server\db\mynetdb.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\Menar\source\C++\socket\CMakeLists.txt" />

@@ -30,6 +30,8 @@ Crypto::~Crypto() {
 SSL_CTX* Crypto::generatingKeys() {
     const SSL_METHOD* method = TLS_server_method();
     SSL_CTX* ctx = SSL_CTX_new(method);
+    SSL_CTX_set_min_proto_version(ctx, TLS1_2_VERSION);
+    SSL_CTX_set_max_proto_version(ctx, TLS1_2_VERSION);
     if (!ctx) {
         std::cerr << "Unable to create SSL context." << std::endl;
         ERR_print_errors_fp(stderr);

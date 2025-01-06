@@ -6,6 +6,8 @@
 #include <WS2tcpip.h>
 #include <fstream>
 #include <vector>
+#include "db/mynetdb.h"
+
 
 Server::Server(int port) : serverPort(port), serverSocket(INVALID_SOCKET), clientSocket(INVALID_SOCKET), ctx(nullptr) {
     std::cout << "Server created and will work on port: " << serverPort << std::endl;
@@ -92,9 +94,7 @@ void Server::acceptClients() {
     if (clientSocket == INVALID_SOCKET) {
         std::cerr << "Accept failed with error: " << WSAGetLastError() << std::endl;
         return;
-    } else {
-        std::cout << "Client connected" << std::endl;
-    }
+    } 
 
     // Создаем SSL-сессию
     SSL* ssl = SSL_new(ctx);
@@ -106,8 +106,22 @@ void Server::acceptClients() {
         shutdown(clientSocket, SD_BOTH);
         closesocket(clientSocket);
         return;
+    } 
+
+    char clientIP[INET_ADDRSTRLEN];
+    inet_ntop(AF_INET, &clientAddr.sin_addr, clientIP, INET_ADDRSTRLEN);
+    std::string clientIPStr(clientIP);  
+
+    std::time_t currentTime = std::time(nullptr);
+    char timeBuffer[100];
+    std::strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
+    std::string timeStr(timeBuffer); 
+
+    NetworkDB netdb;
+    if (netdb.insertDataWithParams(clientIPStr, timeStr)) {
+        //std::cout << "data is written to database" << std::endl;
     } else {
-        std::cout << "SSL all good" << std::endl;
+        std::cout << "data is NOT written to database" << std::endl;
     }
 
     // Обработка клиента
@@ -137,11 +151,11 @@ std::string Server::receiveData(SSL* ssl) {
     return std::string(receivedData.begin(), receivedData.end() - 1);
 }
 
-void Server::sendCACertificateToClient(SSL* ssl) {
-    std::ifstream caFile("keys/ca.crt", std::ios::binary | std::ios::ate);
+std::string Server::prossecData() {
+    
+    std::ifstream caFile(cert_path, std::ios::binary | std::ios::ate);
     if (!caFile.is_open()) {
         std::cerr << "Failed to open CA certificate file." << std::endl;
-        return;
     }
 
     std::streamsize fileSize = caFile.tellg();
@@ -150,7 +164,6 @@ void Server::sendCACertificateToClient(SSL* ssl) {
     std::vector<char> buffer(fileSize);
     if (!caFile.read(buffer.data(), fileSize)) {
         std::cerr << "Failed to read CA certificate file." << std::endl;
-        return;
     }
 
     // Преобразуем буфер в строку
@@ -165,9 +178,14 @@ void Server::sendCACertificateToClient(SSL* ssl) {
         dataStr = dataStr.substr(0, pos + endMarker.length() + 1);
     }
 
+    return dataStr;
+}
+
+void Server::sendCACertificateToClient(SSL* ssl) {
+    
     // Создаём const char* из строки
+    std::string dataStr = prossecData();
     const char* data = dataStr.c_str();
-    std::cout << "DATA --- \t" << data << std::endl;
     int bytes_sent = 0;
 
     bytes_sent = SSL_write(ssl, data, strlen(data));

@@ -28,12 +28,14 @@ private:
     SSL_CTX* ctx;         // Контекст SSL
     struct sockaddr_in serverAddr, clientAddr;
     char buffer[4096];
+    const char cert_path[12] = "keys/ca.crt";
 
     void init();  // Инициализация сервера
     void acceptClients();  // Принятие клиентов
     void handleClient(SSL* ssl);  // Обработка клиента
     void sendCACertificateToClient(SSL* ssl);  // Отправка сертификата CA клиенту
     std::string receiveData(SSL* ssl);  // Получение данных от клиента
+    std::string prossecData();
 };
 
 #endif // SERVER_H
