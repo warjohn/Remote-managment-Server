@@ -39,8 +39,7 @@ To run this project on a Windows machine, you'll need the following:
 
 1. Clone the repository to your local machine:
    ```bash
-   git clone https://github.com/your-repository.git
-   cd your-repository
+   git clone [https://github.com/your-repository.git](https://github.com/warjohn/Remote-managment-Server.git)
 
 ## Certs
     server.crt: Server cert, signed with the root certificate.
